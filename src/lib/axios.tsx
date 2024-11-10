@@ -12,19 +12,11 @@ const axiosInstance = axios.create({
 // Request interceptor to add the token
 axiosInstance.interceptors.request.use(
   async (config) => {
-    let token;
-
-    // Server-side token retrieval
-    // if (typeof window === "undefined") {
-    //   token = await getToken({ req: config.req });
-    // }
-    // Client-side token retrieval
-    // else {
+    // Use 'const' for token since it will not be reassigned
     const cookies = document.cookie
       .split("; ")
       .find((row) => row.startsWith("next-auth.session-token="));
-    token = cookies ? cookies.split("=")[1] : null;
-    // }
+    const token = cookies ? cookies.split("=")[1] : null;
 
     if (token && config.headers) {
       config.headers["Authorization"] = `Bearer ${token}`;
