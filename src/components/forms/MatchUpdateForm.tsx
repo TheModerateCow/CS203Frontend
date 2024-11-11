@@ -2,12 +2,13 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import axiosInstance from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,66 +18,50 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Input } from "../ui/input";
 import { ToastAction } from "../ui/toast";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Separator } from "@/components/ui/separator";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-import { DialogFooter } from "@/components/ui/dialog";
-import { Checkbox } from "../ui/checkbox";
-import { SheetHeader } from "../ui/sheet";
 import { ScrollArea } from "../ui/scroll-area";
 
-const formSchema = z
-  .object({
-    durationInMinutes: z.string().min(1, {
-      message: "Please input duration.",
-    }),
+const formSchema = z.object({
+  durationInMinutes: z.string().min(1, {
+    message: "Please input duration.",
+  }),
 
-    player1Score: z.string().min(1, {
-      message: "Please input score.",
-    }),
+  player1Score: z.string().min(1, {
+    message: "Please input score.",
+  }),
 
-    player2Score: z.string().min(1, {
-      message: "Please input score.",
-    }),
+  player2Score: z.string().min(1, {
+    message: "Please input score.",
+  }),
 
-    punchesPlayer1: z.string().min(1, {
-      message: "Please input punches.",
-    }),
+  punchesPlayer1: z.string().min(1, {
+    message: "Please input punches.",
+  }),
 
-    punchesPlayer2: z.string().min(1, {
-      message: "Please input punches.",
-    }),
+  punchesPlayer2: z.string().min(1, {
+    message: "Please input punches.",
+  }),
 
-    dodgesPlayer1: z.string().min(1, {
-      message: "Please input dodges.",
-    }),
+  dodgesPlayer1: z.string().min(1, {
+    message: "Please input dodges.",
+  }),
 
-    dodgesPlayer2: z.string().min(1, {
-      message: "Please input dodges.",
-    }),
+  dodgesPlayer2: z.string().min(1, {
+    message: "Please input dodges.",
+  }),
 
-    koByPlayer1: z.boolean().default(false),
-    koByPlayer2: z.boolean().default(false),
-  })
-  .refine((data) => !(data.koByPlayer1 && data.koByPlayer2), {
-    message: "Only one player can be knocked out at a time.",
-    path: ["koByPlayer1", "koByPlayer2"],
-  });
+  koByPlayer: z.string(),
+});
 
 interface MyComponentProps {
   matchId: number;
+  onRefresh: () => void;
 }
 
-const MatchUpdateForm: React.FC<MyComponentProps> = ({ matchId }) => {
+const MatchUpdateForm: React.FC<MyComponentProps> = ({
+  matchId,
+  onRefresh,
+}) => {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -87,31 +72,51 @@ const MatchUpdateForm: React.FC<MyComponentProps> = ({ matchId }) => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {},
+    defaultValues: {
+      durationInMinutes: "0",
+      player1Score: "0",
+      player2Score: "0",
+      punchesPlayer1: "0",
+      punchesPlayer2: "0",
+      dodgesPlayer1: "0",
+      dodgesPlayer2: "0",
+    },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
 
     try {
-      const result = await axiosInstance.post(
-        "/api/tournament",
+      let a = false;
+      let b = false;
+
+      if (values.koByPlayer === "player1") {
+        a = true;
+      } else if (values.koByPlayer === "player2") {
+        b = true;
+      }
+
+      const res = await axiosInstance.put(
+        "/api/tournament/match",
         {
-          id: id,
+          id: matchId,
           status: "PENDING",
-          durationInMinutes: values.durationInMinutes,
-          player1Score: values.player1Score,
-          player2Score: values.player2Score,
-          // matchDate: values.matchDate,
-          punchesPlayer1: values.punchesPlayer1,
-          punchesPlayer2: values.punchesPlayer2,
-          dodgesPlayer1: values.dodgesPlayer1,
-          dodgesPlayer2: values.dodgesPlayer2,
-          koByPlayer1: values.koByPlayer1,
-          koByPlayer2: values.koByPlayer2,
+          durationInMinutes: parseInt(values.durationInMinutes),
+          player1Score: parseInt(values.player1Score),
+          player2Score: parseInt(values.player2Score),
+          punchesPlayer1: parseInt(values.punchesPlayer1),
+          punchesPlayer2: parseInt(values.punchesPlayer2),
+          dodgesPlayer1: parseInt(values.dodgesPlayer1),
+          dodgesPlayer2: parseInt(values.dodgesPlayer2),
+          koByPlayer1: a,
+          koByPlayer2: b,
         },
         { withCredentials: true }
       );
+
+      onRefresh();
+      // Refresh the page to display the updated data
+      router.refresh();
     } catch (err) {
       toast({
         variant: "destructive",
@@ -244,7 +249,7 @@ const MatchUpdateForm: React.FC<MyComponentProps> = ({ matchId }) => {
               />
               <FormField
                 control={form.control}
-                name="koByPlayer2"
+                name="koByPlayer"
                 render={({ field }) => (
                   <FormItem className="space-y-3">
                     <FormControl>
@@ -254,7 +259,7 @@ const MatchUpdateForm: React.FC<MyComponentProps> = ({ matchId }) => {
                       >
                         <FormItem className="flex items-center space-x-3 space-y-0">
                           <FormControl>
-                            <RadioGroupItem value="all" />
+                            <RadioGroupItem value="player1" />
                           </FormControl>
                           <FormLabel className="font-normal">
                             Player 1 was KOed
@@ -262,7 +267,7 @@ const MatchUpdateForm: React.FC<MyComponentProps> = ({ matchId }) => {
                         </FormItem>
                         <FormItem className="flex items-center space-x-3 space-y-0">
                           <FormControl>
-                            <RadioGroupItem value="mentions" />
+                            <RadioGroupItem value="player2" />
                           </FormControl>
                           <FormLabel className="font-normal">
                             Player 2 was KOed

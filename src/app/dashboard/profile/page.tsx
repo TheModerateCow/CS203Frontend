@@ -1,7 +1,5 @@
 "use client";
 
-import CountChart from "@/components/CountChart";
-import UserCard from "@/components/UserCard";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";

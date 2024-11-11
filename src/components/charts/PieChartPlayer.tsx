@@ -43,35 +43,48 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 interface MyComponentProps {
-  data: MatchData[];
+  data: any;
+  playerId: number;
   title: string;
   description?: string;
 }
 
 const PieChartGraph: React.FC<MyComponentProps> = ({
+  playerId,
   data,
   title,
   description,
 }) => {
   const totalGames = data.length;
 
-  function transformMatchData(matches: MatchData[]): PieChartData[] {
+  function calculatePlayerStats(
+    matches: Match[],
+    playerId: number
+  ): PlayerStatsDisplay[] {
     let winCount = 0;
     let loseCount = 0;
     let drawCount = 0;
     let onGoingCount = 0;
 
-    // Fix this logic tmr
-    // TODO
     matches.forEach((match) => {
-      if (match.player1Score === null || match.player2Score === null) {
+      const isPlayer1 = match.player1.id === playerId;
+      const isPlayer2 = match.player2.id === playerId;
+      if (match.status === "SCHEDULED") {
         onGoingCount++;
-      } else if (match.player1Score > match.player2Score) {
-        winCount++;
-      } else if (match.player1Score < match.player2Score) {
-        loseCount++;
-      } else {
-        drawCount++;
+      } else if (match.player1Score !== null && match.player2Score !== null) {
+        // The match is completed, calculate win, loss, or draw
+        const playerScore = isPlayer1 ? match.player1Score : match.player2Score;
+        const opponentScore = isPlayer1
+          ? match.player2Score
+          : match.player1Score;
+
+        if (playerScore > opponentScore) {
+          winCount++;
+        } else if (playerScore < opponentScore) {
+          loseCount++;
+        } else {
+          drawCount++;
+        }
       }
     });
 
@@ -83,7 +96,7 @@ const PieChartGraph: React.FC<MyComponentProps> = ({
     ];
   }
 
-  const parseDate: PieChartData[] = transformMatchData(data);
+  const parseDate: PieChartData[] = calculatePlayerStats(data, playerId);
 
   // Calculate percentages for the footer
   const winPercentage =
@@ -218,3 +231,56 @@ export interface PieChartData {
   count: number;
   fill: string;
 }
+
+type Player = {
+  id: number;
+  username: string;
+  userType: string;
+  name: string;
+  eloRating: number;
+};
+
+type Tournament = {
+  id: number;
+  name: string;
+  startDate: string;
+  endDate: string | null;
+  location: string;
+  status: string;
+  minEloRating: number;
+  maxEloRating: number;
+  format: string;
+};
+
+type Match = {
+  id: number;
+  durationInMinutes: number | null;
+  status: string;
+  bracket: string;
+  player1Score: number | null;
+  player2Score: number | null;
+  matchDate: string;
+  round: number;
+  player1: Player;
+  player2: Player;
+  tournament: Tournament;
+  punchesPlayer1: number;
+  punchesPlayer2: number;
+  dodgesPlayer1: number;
+  dodgesPlayer2: number;
+  koByPlayer1: boolean;
+  koByPlayer2: boolean;
+};
+
+type PlayerStats = {
+  wins: number;
+  losses: number;
+  draws: number;
+  ongoing: number;
+};
+
+type PlayerStatsDisplay = {
+  state: string;
+  count: number;
+  fill: string;
+};

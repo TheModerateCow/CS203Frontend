@@ -74,6 +74,11 @@ const LoginForm = () => {
         description: "Please check your connection.",
         action: <ToastAction altText="Try again">Try again</ToastAction>,
       });
+    } finally {
+      setTimeout(() => {
+        console.log("");
+      }, 1000);
+      setLoading(false);
     }
   };
 

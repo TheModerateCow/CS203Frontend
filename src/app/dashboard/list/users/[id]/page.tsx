@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 const SingleUserPage = ({ params }: { params: Promise<{ slug: string }> }) => {
   const { data: session, status } = useSession();
   const [user, setUser] = useState<User>();
+  const [userId, setUserId] = useState<number>(1);
   const [eloRecords, setEloRecords] = useState<any[]>([]);
   const [playerStats, setPlayerStats] = useState<any[]>([]);
   const [matches, setMatches] = useState<any[]>([]);
@@ -34,6 +35,7 @@ const SingleUserPage = ({ params }: { params: Promise<{ slug: string }> }) => {
           withCredentials: true,
         });
         setUser(userRes.data);
+        setUserId(userRes.data.id);
 
         const eloRecordRes = await axiosInstance.get(
           "/api/elo-records/player/" + id,
@@ -55,7 +57,6 @@ const SingleUserPage = ({ params }: { params: Promise<{ slug: string }> }) => {
           withCredentials: true,
         });
         setMatches(matchRes.data);
-        // console.log(matchRes.data);
       } catch (err) {
         console.error("Error fetching match:", err);
         setError("Failed to load match.");
@@ -161,6 +162,7 @@ const SingleUserPage = ({ params }: { params: Promise<{ slug: string }> }) => {
                 description="The pie chart shows the percentage breakdown of wins, losses, and draws in a set of matches."
                 title="Win-Lose-Draw"
                 data={matches}
+                playerId={userId}
               />
               <EloLineGraph
                 description="A Timeline of Elo Progression"

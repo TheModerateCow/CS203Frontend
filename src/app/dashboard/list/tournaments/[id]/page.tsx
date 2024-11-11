@@ -24,6 +24,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { AiFillFire, AiFillNotification, AiFillSignal } from "react-icons/ai";
 import { CiCirclePlus } from "react-icons/ci";
 
 const SingleTournamentPage = ({
@@ -37,6 +38,7 @@ const SingleTournamentPage = ({
   const [tournament, setTournaments] = useState<Tournament>();
   const [matches, setMatches] = useState<Match[]>([]);
   const [players, setPlayers] = useState<Player[]>([]);
+  const [winner, setWinner] = useState<User>();
   const [tournamentId, setTournamentId] = useState<number>();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -54,6 +56,14 @@ const SingleTournamentPage = ({
         setMatches(tournamentRes.data.matches);
         setPlayers(tournamentRes.data.players);
         setTournamentId(tournamentRes.data.id);
+
+        const winnerRes = await axiosInstance.get(
+          "/api/tournament/winner/" + id,
+          {
+            withCredentials: true,
+          }
+        );
+        setWinner(winnerRes.data);
       } catch (err) {
         console.error("Error fetching tournaments:", err);
         setError("Failed to load tournaments.");
@@ -102,13 +112,6 @@ const SingleTournamentPage = ({
       className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
     >
       <td className="flex items-center gap-4 p-4">
-        {/* <Image
-          src="/"
-          alt=""
-          width={40}
-          height={40}
-          className="md:hidden xl:block w-10 h-10 rounded-full object-cover"
-        /> */}
         <div className="flex flex-col">
           <h3 className="font-semibold">
             {item.player1.name} vs {item.player2.name}
@@ -132,7 +135,7 @@ const SingleTournamentPage = ({
           ? item.player1Score + " : " + item.player2Score
           : "Undecided"}
       </td>
-      <td>{formatReadableDate(item.matchDate)}</td>
+      <td>{item.bracket}</td>
       <td>
         <div className="flex items-center gap-2">
           <Link href={`/dashboard/list/matches/${item.id}`}>
@@ -152,7 +155,7 @@ const SingleTournamentPage = ({
                   <SheetTitle>Updating the Match</SheetTitle>
                   <SheetDescription>Fates are decided here!</SheetDescription>
                 </SheetHeader>
-                <MatchUpdateForm matchId={item.id} />
+                <MatchUpdateForm matchId={item.id} onRefresh={handleRefresh} />
               </SheetContent>
             </Sheet>
           )}
@@ -218,10 +221,13 @@ const SingleTournamentPage = ({
               will face off in both single and team events, battling through
               intense rounds for the coveted title and ultimate bragging rights.
             </p>
-            <div className="flex items-center justify-between gap-2 flex-wrap text-xs font-medium">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 2xl:grid-cols-3 gap-2 text-xs font-semibold">
               <div className="w-full md:w-1/3 lg:w-full 2xl:w-1/3 flex items-center gap-2">
                 <Image src="/date.png" alt="" width={14} height={14} />
-                <span>{formatReadableDate(tournament?.startDate)}</span>
+                <span>
+                  {formatReadableDate(tournament?.startDate)} -{" "}
+                  {formatReadableDate(tournament?.endDate)}
+                </span>
               </div>
               <div className="w-full md:w-1/3 lg:w-full 2xl:w-1/3 flex items-center gap-2">
                 <Image src="/mail.png" alt="" width={14} height={14} />
@@ -231,7 +237,23 @@ const SingleTournamentPage = ({
                 <Image src="/phone.png" alt="" width={14} height={14} />
                 <span>+65 1234 5678</span>
               </div>
-              <div>
+              <div className="w-full md:w-1/3 lg:w-full 2xl:w-1/3 flex items-center gap-2">
+                <AiFillNotification size={17} />
+                <span>{toTitleCase(tournament?.format)}</span>
+              </div>
+              <div className="w-full md:w-1/3 lg:w-full 2xl:w-1/3 flex items-center gap-2">
+                <AiFillSignal size={17} />
+                <span>
+                  {tournament?.minEloRating} - {tournament?.maxEloRating}
+                </span>
+              </div>
+              {tournament?.status === "COMPLETED" && (
+                <div className="w-full md:w-1/3 lg:w-full 2xl:w-1/3 flex items-center gap-2">
+                  <AiFillFire size={17} />
+                  <span>{winner?.username}</span>
+                </div>
+              )}
+              <div className="w-full md:w-1/3 lg:w-full 2xl:w-1/3 flex items-center gap-2">
                 <Badge
                   className={clsx({
                     "bg-yellow-500": tournament?.status === "SCHEDULED",
@@ -317,7 +339,7 @@ const columns = [
     className: "hidden md:table-cell",
   },
   {
-    header: "Match Date",
+    header: "Bracket",
     accessor: "tournament",
     className: "hidden lg:table-cell",
   },

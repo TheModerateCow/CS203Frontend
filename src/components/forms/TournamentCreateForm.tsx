@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -16,6 +17,16 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Input } from "../ui/input";
 import { ToastAction } from "../ui/toast";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 import {
   Select,
@@ -27,7 +38,6 @@ import {
 
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -43,8 +53,8 @@ const formSchema = z.object({
   name: z.string().min(1, {
     message: "Please input your Tournament Name.",
   }),
-  startDate: z.string().min(1, {
-    message: "Please input your start date.",
+  startDate: z.date({
+    required_error: "A start date is required.",
   }),
   location: z.string().min(1, {
     message: "Please input your location.",
@@ -75,7 +85,7 @@ const TournamentCreateForm: React.FC<MyComponentProps> = ({ onRefresh }) => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      startDate: "",
+      // startDate: Date.now(),
       location: "",
       minEloRating: "600",
       maxEloRating: "1200",
@@ -87,7 +97,7 @@ const TournamentCreateForm: React.FC<MyComponentProps> = ({ onRefresh }) => {
     setLoading(true);
 
     try {
-      const result = await axiosInstance.post(
+      await axiosInstance.post(
         "/api/tournament",
         {
           name: values.name,
@@ -133,6 +143,7 @@ const TournamentCreateForm: React.FC<MyComponentProps> = ({ onRefresh }) => {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <div className="flex flex-col gap-6 ">
+                {/* Tournament Name */}
                 <FormField
                   control={form.control}
                   name="name"
@@ -148,7 +159,8 @@ const TournamentCreateForm: React.FC<MyComponentProps> = ({ onRefresh }) => {
                     </FormItem>
                   )}
                 />
-                <FormField
+                {/* Start Date */}
+                {/* <FormField
                   control={form.control}
                   name="startDate"
                   render={({ field }) => (
@@ -157,6 +169,53 @@ const TournamentCreateForm: React.FC<MyComponentProps> = ({ onRefresh }) => {
                       <FormControl className="col-span-3">
                         <Input placeholder="" {...field} />
                       </FormControl>
+                      <FormMessage className="col-span-3 col-start-2" />
+                    </FormItem>
+                  )}
+                /> */}
+                <FormField
+                  control={form.control}
+                  name="startDate"
+                  render={({ field }) => (
+                    <FormItem className="grid grid-cols-4 items-center gap-4">
+                      <FormLabel className="text-right">Start Date</FormLabel>
+                      <Popover modal={true}>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              type="button"
+                              variant={"outline"}
+                              className={cn(
+                                "w-[240px] pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Pick a date </span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent
+                          className="w-auto p-0"
+                          align="start"
+                          sideOffset={4}
+                        >
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={(date) => {
+                              field.onChange(date);
+                              // You might want to handle the popover closing here if needed
+                            }}
+                            disabled={(date) => date < new Date()}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
                       <FormMessage className="col-span-3 col-start-2" />
                     </FormItem>
                   )}
@@ -234,7 +293,6 @@ const TournamentCreateForm: React.FC<MyComponentProps> = ({ onRefresh }) => {
               </div>
 
               <DialogFooter className="sm:justify-start">
-                {/* <DialogClose asChild> */}
                 <Button
                   type="submit"
                   disabled={loading}
@@ -242,7 +300,6 @@ const TournamentCreateForm: React.FC<MyComponentProps> = ({ onRefresh }) => {
                 >
                   {loading ? "Adding Tournament..." : "Add Tournament"}
                 </Button>
-                {/* </DialogClose> */}
               </DialogFooter>
             </form>
           </Form>
