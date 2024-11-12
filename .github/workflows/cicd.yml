@@ -27,5 +27,9 @@ jobs:
         run: docker stop nextjs-app-container || true
       # - name: Delete old image
       #   run: docker rmi nextjs-app-container || true
+      - name: Stop and remove existing container (if running)
+        run: |
+          docker stop nextjs-app-container || true
+          docker rm nextjs-app-container || true
       - name: Run docker container
         run: docker run -d -p 80:3000 --name nextjs-app-container cs203someshit/tournax-frontend:${{ github.sha }}
