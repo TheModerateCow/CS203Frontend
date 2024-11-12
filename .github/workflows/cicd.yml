@@ -24,8 +24,8 @@ jobs:
       - name: Pull image from docker hub
         run: docker pull cs203someshit/tournax-frontend:latest
       - name: Stop previous process
-        run: docker stop nextjs-app-container
-      - name: Delete old container
-        run: docker rmi nextjs-app-container
+        run: docker stop nextjs-app-container || true
+      - name: Delete old image
+        run: docker rmi nextjs-app-container || true
       - name: Run docker container
         run: docker run -d -p 80:3000 --name nextjs-app-container cs203someshit/tournax-frontend
