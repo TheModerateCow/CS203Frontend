@@ -1,0 +1,29 @@
+name: Deploy Next.js applications
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+      - name: Build docker image
+        run: docker build -t themoderatecow/tournax-frontend .
+      - name: Login to docker hub
+        run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
+      - name: Publish image to docker hub
+        run: docker push themoderatecow/tournax-frontend:latest
+  deploy:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Pull image from docker hub
+        run: docker pull themoderatecow/tournax-frontend:latest
+      - name: Delete old container
+        run: docker rm -r nextjs-app-container
+      - name: Run docker container
+        run: docker run -d -p 80:3000 --name nextjs-app-container themoderatecow/tournax-frontend
