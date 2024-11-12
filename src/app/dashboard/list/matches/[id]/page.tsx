@@ -84,7 +84,7 @@ const SingleTournamentPage = ({
           <div className="w-9/12 flex flex-col justify-between gap-4">
             <div className="flex items-center gap-4">
               <h1 className="text-xl font-semibold">
-                {match?.player1.name} vs {match?.player2.name}
+                {match?.player1.username} vs {match?.player2.username}
               </h1>
             </div>
             <p className="text-sm text-gray-500">
