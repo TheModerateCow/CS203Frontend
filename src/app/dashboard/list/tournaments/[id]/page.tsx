@@ -118,7 +118,7 @@ const SingleTournamentPage = ({
       <td className="flex items-center gap-4 p-4">
         <div className="flex flex-col">
           <h3 className="font-semibold">
-            {item.player1.name} vs {item.player2.name}
+            {item.player1.username} vs {item.player2.username}
           </h3>
         </div>
       </td>
