@@ -129,30 +129,33 @@ const SingleUserPage = ({ params }: { params: Promise<{ slug: string }> }) => {
           </div>
           <div className="w-9/12 flex flex-col justify-between gap-4">
             <div className="flex items-center gap-4 py-5">
-              <h1 className="text-2xl font-semibold underline">
-                {user?.username}
-              </h1>
+              <h1 className="text-xl font-semibold">{user?.username}</h1>
             </div>
-            <p className="text-xl text-black">Hello!</p>
+            <p className="text-sm text-gray-500">
+              An enthusiastic competitor with a passion for strategy and skill
+              improvement. Known for agility and quick thinking, they thrive
+              under pressure and bring a positive, team-oriented mindset to
+              every game.
+            </p>
             <div className="flex flex-col items-start gap-2 text-xs font-medium">
               {/* Email */}
-              <div className="w-full flex items-center gap-2 text-xl">
+              <div className="w-full flex items-center gap-2">
                 <Image
                   src="/mail.png"
                   alt="Email Icon"
-                  width={22}
-                  height={22}
+                  width={14}
+                  height={14}
                 />
                 <span>{user?.email}</span>
               </div>
 
               {/* User Type */}
-              <div className="w-full flex items-center gap-2 text-xl">
+              <div className="w-full flex items-center gap-2">
                 <Image
                   src="/profile.png"
                   alt="Profile Icon"
-                  width={22}
-                  height={22}
+                  width={14}
+                  height={14}
                 />
                 <span>
                   {user?.userType === "ROLE_ADMIN" ? "Admin" : "Player"}
