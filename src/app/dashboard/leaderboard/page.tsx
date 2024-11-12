@@ -53,8 +53,8 @@ const LeaderBoardPage = () => {
     >
       <td className="flex items-center gap-4 p-4">
         <div className="flex flex-col">
-          <h3 className="font-semibold">{item.name}</h3>
-          <p className="text-xs text-gray-500">{item.username}</p>
+          <h3 className="font-semibold">{item.username}</h3>
+          <p className="text-xs text-gray-500">{item.name}</p>
         </div>
       </td>
       <td className="hidden md:table-cell">{Math.trunc(item.eloRating)}</td>

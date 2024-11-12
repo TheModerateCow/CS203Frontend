@@ -175,8 +175,8 @@ const SingleTournamentPage = ({
     >
       <td className="flex items-center gap-4 p-4">
         <div className="flex flex-col">
-          <h3 className="font-semibold">{item.name}</h3>
-          <p className="text-xs text-gray-500">{item.username}</p>
+          <h3 className="font-semibold">{item.username}</h3>
+          <p className="text-xs text-gray-500">{item.name}</p>
         </div>
       </td>
       <td>
@@ -223,7 +223,7 @@ const SingleTournamentPage = ({
                 ? "The Ultimate Challenge Cup 2024 is an annual, high-stakes tournament that brings together competitors from across the globe to test their skills in an electrifying series of matches. From seasoned professionals to rising stars, this competition showcases talent, strategy, and sportsmanship at its finest. Competitors will face off in both single and team events, battling through intense rounds for the coveted title and ultimate bragging rights."
                 : (tournament as any)?.description}
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 2xl:grid-cols-3 gap-2 text-xs font-semibold">
+            <div className="flex items-center justify-between gap-2 flex-wrap text-xs font-medium">
               <div className="w-full md:w-1/3 lg:w-full 2xl:w-1/3 flex items-center gap-2">
                 <Image src="/date.png" alt="" width={14} height={14} />
                 <span>
