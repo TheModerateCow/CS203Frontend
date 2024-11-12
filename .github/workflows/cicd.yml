@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Pull image from docker hub
         run: docker pull themoderatecow/tournax-frontend:latest
-      - name: Delete old container
-        run: docker rm -r nextjs-app-container
+      # - name: Delete old container
+      #   run: docker rm -r nextjs-app-container
       - name: Run docker container
         run: docker run -d -p 80:3000 --name nextjs-app-container themoderatecow/tournax-frontend
