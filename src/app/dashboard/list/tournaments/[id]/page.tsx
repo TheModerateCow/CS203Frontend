@@ -57,11 +57,17 @@ const SingleTournamentPage = ({
         setMatches(tournamentRes.data.matches);
         setPlayers(tournamentRes.data.players);
         setTournamentId(tournamentRes.data.id);
+        console.log(tournamentRes.data);
 
-        const winnerRes = await axiosAuth.get("/api/tournament/winner/" + id, {
-          withCredentials: true,
-        });
-        setWinner(winnerRes.data);
+        if (tournamentRes.data.status === "COMPLETED") {
+          const winnerRes = await axiosAuth.get(
+            "/api/tournament/winner/" + tournamentRes.data.id
+          );
+          setWinner(winnerRes.data);
+        }
+        // const winnerRes = await axiosAuth.get("/api/tournament/winner/" + id, {
+        //   withCredentials: true,
+        // });
       } catch (err) {
         console.error("Error fetching tournaments:", err);
         setError("Failed to load tournaments.");
@@ -203,21 +209,19 @@ const SingleTournamentPage = ({
           <div className="w-9/12 flex flex-col justify-between gap-4">
             <div className="flex items-center gap-4">
               <h1 className="text-xl font-semibold">{tournament?.name}</h1>
-              {(session?.user as any)?.user.userType === "ROLE_ADMIN" && (
-                <TournamentUpdateForm
-                  data={tournament}
-                  onRefresh={handleRefresh}
-                />
-              )}
+              {(session?.user as any)?.user.userType === "ROLE_ADMIN" &&
+                tournament?.status === "SCHEDULED" && (
+                  <TournamentUpdateForm
+                    data={tournament}
+                    onRefresh={handleRefresh}
+                  />
+                )}
             </div>
             <p className="text-sm text-gray-500">
-              The Ultimate Challenge Cup 2024 is an annual, high-stakes
-              tournament that brings together competitors from across the globe
-              to test their skills in an electrifying series of matches. From
-              seasoned professionals to rising stars, this competition showcases
-              talent, strategy, and sportsmanship at its finest. Competitors
-              will face off in both single and team events, battling through
-              intense rounds for the coveted title and ultimate bragging rights.
+              {(tournament as any)?.description == null ||
+              (tournament as any)?.description == ""
+                ? "The Ultimate Challenge Cup 2024 is an annual, high-stakes tournament that brings together competitors from across the globe to test their skills in an electrifying series of matches. From seasoned professionals to rising stars, this competition showcases talent, strategy, and sportsmanship at its finest. Competitors will face off in both single and team events, battling through intense rounds for the coveted title and ultimate bragging rights."
+                : (tournament as any)?.description}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 2xl:grid-cols-3 gap-2 text-xs font-semibold">
               <div className="w-full md:w-1/3 lg:w-full 2xl:w-1/3 flex items-center gap-2">

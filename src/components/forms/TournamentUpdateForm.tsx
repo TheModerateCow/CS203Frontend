@@ -10,19 +10,11 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Input } from "../ui/input";
 import { ToastAction } from "../ui/toast";
-
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 import {
   Dialog,
@@ -36,14 +28,20 @@ import {
 
 // import * as dialog from "@/components/ui/dialog";
 import useAxioAuth from "@/hooks/useAxioAuth";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
 import { CiEdit } from "react-icons/ci";
+import { Calendar } from "../ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Textarea } from "../ui/textarea";
 
 const formSchema = z.object({
   name: z.string().min(1, {
     message: "Please input your Tournament Name.",
   }),
-  startDate: z.string().min(1, {
-    message: "Please input your start date.",
+  startDate: z.date({
+    required_error: "A start date is required.",
   }),
   location: z.string().min(1, {
     message: "Please input your location.",
@@ -54,10 +52,7 @@ const formSchema = z.object({
   maxEloRating: z.string().min(1, {
     message: "Please input your maximum elo rating.",
   }),
-  format: z.enum(["SWISS", "DOUBLE_ELIMINATION", "HYBRID"], {
-    message:
-      "Please input a valid format: SWISS, DOUBLE_ELIMINATION, or HYBRID.",
-  }),
+  description: z.string(),
 });
 
 interface MyComponentProps {
@@ -74,38 +69,45 @@ const TournamentUpdateForm: React.FC<MyComponentProps> = ({
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const axiosAuth = useAxioAuth();
+  const [tournament, setTournament] = useState<any>();
+
+  useEffect(() => {
+    if (data) {
+      setTournament(data);
+      form.reset({
+        name: data.name,
+        location: data.location,
+        minEloRating: String(data.minEloRating),
+        maxEloRating: String(data.maxEloRating),
+        // description: data.description,
+      });
+    }
+  }, [data]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      startDate: "",
-      location: "",
-      minEloRating: "600",
-      maxEloRating: "1200",
-      format: "SWISS",
-    },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
 
     try {
-      const result = await axiosAuth.post(
-        "/api/tournament",
+      const result = await axiosAuth.put(
+        "/api/tournament/" + tournament.id,
         {
           name: values.name,
           startDate: values.startDate,
           location: values.location,
-          minEloRating: values.minEloRating,
-          maxEloRating: values.maxEloRating,
-          format: values.format,
+          minEloRating: parseInt(values.minEloRating),
+          maxEloRating: parseInt(values.maxEloRating),
+          description: values.description,
+          format: tournament.format,
         },
         { withCredentials: true }
       );
 
-      // onRefresh();
-      // router.refresh();
+      onRefresh();
+      router.refresh();
       setDialogOpen(false);
     } catch (err) {
       toast({
@@ -160,9 +162,43 @@ const TournamentUpdateForm: React.FC<MyComponentProps> = ({
                   render={({ field }) => (
                     <FormItem className="grid grid-cols-4 items-center gap-4">
                       <FormLabel className="text-right">Start Date</FormLabel>
-                      <FormControl className="col-span-3">
-                        <Input placeholder="" {...field} />
-                      </FormControl>
+                      <Popover modal={true}>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              type="button"
+                              variant={"outline"}
+                              className={cn(
+                                "w-[240px] pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent
+                          className="w-auto p-0"
+                          align="start"
+                          sideOffset={4}
+                        >
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={(date) => {
+                              field.onChange(date);
+                              // You might want to handle the popover closing here if needed
+                            }}
+                            disabled={(date) => date < new Date()}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
                       <FormMessage className="col-span-3 col-start-2" />
                     </FormItem>
                   )}
@@ -189,7 +225,7 @@ const TournamentUpdateForm: React.FC<MyComponentProps> = ({
                         Minimum Elo Rating
                       </FormLabel>
                       <FormControl className="col-span-3">
-                        <Input placeholder="" {...field} />
+                        <Input placeholder={data.maxEloRating} {...field} />
                       </FormControl>
                       <FormMessage className="col-span-3 col-start-2" />
                     </FormItem>
@@ -212,26 +248,15 @@ const TournamentUpdateForm: React.FC<MyComponentProps> = ({
                 />
                 <FormField
                   control={form.control}
-                  name="format"
+                  name="description"
                   render={({ field }) => (
                     <FormItem className="grid grid-cols-4 items-center gap-4">
-                      <FormLabel className="text-right">Format</FormLabel>
+                      <FormLabel className="text-right">Description</FormLabel>
                       <FormControl className="col-span-3">
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Select Format" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="SWISS">SWISS</SelectItem>
-                            <SelectItem value="DOUBLE_ELIMINATION">
-                              Double Elimination
-                            </SelectItem>
-                            <SelectItem value="HYBRID">Hybrid</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <Textarea
+                          placeholder="What is on your mind?"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage className="col-span-3 col-start-2" />
                     </FormItem>
@@ -246,7 +271,7 @@ const TournamentUpdateForm: React.FC<MyComponentProps> = ({
                   disabled={loading}
                   className="hover:bg-lamaSky hover:text-gray-600 mt-5"
                 >
-                  {loading ? "Adding Tournament..." : "Add Tournament"}
+                  {loading ? "Updating Tournament..." : "Update Tournament"}
                 </Button>
                 {/* </DialogClose> */}
               </DialogFooter>

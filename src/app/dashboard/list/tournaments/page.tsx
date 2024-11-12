@@ -3,12 +3,14 @@
 import TournamentCreateForm from "@/components/forms/TournamentCreateForm";
 import Table from "@/components/Table";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 import useAxioAuth from "@/hooks/useAxioAuth";
 import { toTitleCase } from "@/lib/utils";
 import clsx from "clsx";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const columns = [
@@ -51,6 +53,8 @@ const TournamentPage = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const axiosAuth = useAxioAuth();
+  const { toast } = useToast();
+  const router = useRouter();
 
   // Fetch data using Axios
   useEffect(() => {
@@ -73,6 +77,28 @@ const TournamentPage = () => {
   }, [shouldRefresh]);
 
   const handleRefresh = () => setShouldRefresh(true);
+
+  const deleteTournament = async (id: number) => {
+    try {
+      await axiosAuth.delete("/api/tournament/" + id, {
+        withCredentials: true,
+      });
+      router.refresh();
+      handleRefresh();
+
+      toast({
+        title: "Tournament has been deleted",
+        description: "LMAO GET DESTROYED BRO!!!",
+      });
+    } catch (err) {
+      setLoading(false);
+      toast({
+        title: "Oopie",
+        description: "Cannot delete tournament right now",
+        variant: "destructive",
+      });
+    }
+  };
 
   const renderRow = (item: Tournament) => (
     <tr
@@ -107,8 +133,11 @@ const TournamentPage = () => {
               <Image src="/view.png" alt="" width={16} height={16} />
             </button>
           </Link>
-          {(session?.user as any)?.user.id === item.adminId && (
-            <button className="w-7 h-7 flex items-center justify-center rounded-full bg-lamaPurple">
+          {item.status === "SCHEDULED" && (
+            <button
+              onClick={() => deleteTournament(item.id)}
+              className="w-7 h-7 flex items-center justify-center rounded-full bg-lamaPurple"
+            >
               <Image src="/delete.png" alt="" width={16} height={16} />
             </button>
           )}

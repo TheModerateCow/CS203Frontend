@@ -89,7 +89,7 @@ const TournamentCreateForm: React.FC<MyComponentProps> = ({ onRefresh }) => {
       location: "",
       minEloRating: "600",
       maxEloRating: "1200",
-      format: "SWISS",
+      format: "DOUBLE_ELIMINATION",
     },
   });
 
