@@ -18,7 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import axiosInstance from "@/lib/axios";
+import useAxioAuth from "@/hooks/useAxioAuth";
 
 const formSchema = z
   .object({
@@ -47,6 +47,7 @@ export default function RegisterAdminPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const axioAuth = useAxioAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -62,7 +63,7 @@ export default function RegisterAdminPage() {
     setLoading(true);
 
     try {
-      const result = await axiosInstance.post("/api/auth/register", {
+      const result = await axioAuth.post("/api/auth/register", {
         username: values.username,
         password: values.password,
         email: values.email,

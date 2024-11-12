@@ -30,6 +30,7 @@ const handler = NextAuth({
         );
 
         const user = await res.json();
+        console.log(user);
 
         if (res.ok && user) {
           // Any object returned will be saved in `user` property of the JWT
@@ -49,12 +50,15 @@ const handler = NextAuth({
   },
   callbacks: {
     async jwt({ token, user }) {
-      // console.log(user);
+      if (user) {
+        // token.accessToken = user.access_token;
+      }
       return { ...token, ...user };
     },
 
     async session({ session, token }) {
       session.user = token as any;
+      console.log(session.user);
       return session;
     },
   },

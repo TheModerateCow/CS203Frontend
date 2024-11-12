@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/hooks/use-toast";
-import axiosInstance from "@/lib/axios";
+import useAxioAuth from "@/hooks/useAxioAuth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -48,6 +48,7 @@ export default function RegisterPlayerPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const axioAuth = useAxioAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -63,7 +64,7 @@ export default function RegisterPlayerPage() {
     setLoading(true);
 
     try {
-      const result = await axiosInstance.post("/api/auth/register", {
+      const result = await axioAuth.post("/api/auth/register", {
         username: values.username,
         password: values.password,
         email: values.email,

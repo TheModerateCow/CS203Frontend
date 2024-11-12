@@ -3,7 +3,7 @@
 import Pagination from "@/components/Pagination";
 import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
-import axiosInstance from "@/lib/axios";
+import useAxioAuth from "@/hooks/useAxioAuth";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -27,11 +27,13 @@ const LeaderBoardPage = () => {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const axioAuth = useAxioAuth();
+
   // Fetch data using Axios
   useEffect(() => {
     const fetchTournaments = async () => {
       try {
-        const response = await axiosInstance.get("/api/player/ranking", {
+        const response = await axioAuth.get("/api/player/ranking", {
           withCredentials: true,
         });
         setMatches(response.data);

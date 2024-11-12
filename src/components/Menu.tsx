@@ -1,5 +1,6 @@
 import { signOut } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   CiBullhorn,
   CiHome,
@@ -55,6 +56,7 @@ const menuItemsOthers = [
 ];
 
 const Menu = () => {
+  const router = useRouter();
   return (
     <div className="mt-4 text-sm">
       {menuItems.map((i) => (
@@ -93,7 +95,10 @@ const Menu = () => {
           <Link
             href="/"
             key="logout"
-            onClick={() => signOut()}
+            onClick={() => {
+              signOut({ redirect: false });
+              router.push("/hello");
+            }}
             className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2"
           >
             <CiLogout size={20} />

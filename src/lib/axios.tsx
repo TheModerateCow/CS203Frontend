@@ -9,6 +9,13 @@ const axiosInstance = axios.create({
   },
 });
 
+export const axiosAuth = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL, // Replace with your actual backend URL
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
 // Request interceptor to add the token
 axiosInstance.interceptors.request.use(
   async (config) => {
@@ -18,6 +25,7 @@ axiosInstance.interceptors.request.use(
       .find((row) => row.startsWith("next-auth.session-token="));
     const token = cookies ? cookies.split("=")[1] : null;
 
+    console.log("Start the run");
     if (token && config.headers) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }

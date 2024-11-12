@@ -8,7 +8,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import axiosInstance from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -27,7 +26,6 @@ import {
 
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -37,7 +35,7 @@ import {
 } from "@/components/ui/dialog";
 
 // import * as dialog from "@/components/ui/dialog";
-import Image from "next/image";
+import useAxioAuth from "@/hooks/useAxioAuth";
 import { CiEdit } from "react-icons/ci";
 
 const formSchema = z.object({
@@ -75,6 +73,7 @@ const TournamentUpdateForm: React.FC<MyComponentProps> = ({
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const axiosAuth = useAxioAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -92,7 +91,7 @@ const TournamentUpdateForm: React.FC<MyComponentProps> = ({
     setLoading(true);
 
     try {
-      const result = await axiosInstance.post(
+      const result = await axiosAuth.post(
         "/api/tournament",
         {
           name: values.name,

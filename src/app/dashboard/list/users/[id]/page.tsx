@@ -6,7 +6,7 @@ import PieChartGraph from "@/components/charts/PieChartPlayer";
 import RadialGraph from "@/components/charts/RadialGraphsPlayer";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import axiosInstance from "@/lib/axios";
+import useAxioAuth from "@/hooks/useAxioAuth";
 import { formatReadableDate, toTitleCase } from "@/lib/utils";
 import clsx from "clsx";
 import { Link } from "lucide-react";
@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 
 const SingleUserPage = ({ params }: { params: Promise<{ slug: string }> }) => {
   const { data: session, status } = useSession();
+  const axiosAuth = useAxioAuth();
   const [user, setUser] = useState<User>();
   const [userId, setUserId] = useState<number>(1);
   const [eloRecords, setEloRecords] = useState<any[]>([]);
@@ -31,13 +32,13 @@ const SingleUserPage = ({ params }: { params: Promise<{ slug: string }> }) => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
         const id = await params.id;
-        const userRes = await axiosInstance.get("/api/user/" + id, {
+        const userRes = await axiosAuth.get("/api/user/" + id, {
           withCredentials: true,
         });
         setUser(userRes.data);
         setUserId(userRes.data.id);
 
-        const eloRecordRes = await axiosInstance.get(
+        const eloRecordRes = await axiosAuth.get(
           "/api/elo-records/player/" + id,
           {
             withCredentials: true,
@@ -45,7 +46,7 @@ const SingleUserPage = ({ params }: { params: Promise<{ slug: string }> }) => {
         );
         setEloRecords(eloRecordRes.data);
 
-        const playerStatsRes = await axiosInstance.get(
+        const playerStatsRes = await axiosAuth.get(
           "/api/player-stats/player/" + id,
           {
             withCredentials: true,
@@ -53,7 +54,7 @@ const SingleUserPage = ({ params }: { params: Promise<{ slug: string }> }) => {
         );
         setPlayerStats(playerStatsRes.data);
 
-        const matchRes = await axiosInstance.get("/api/match/player/" + id, {
+        const matchRes = await axiosAuth.get("/api/match/player/" + id, {
           withCredentials: true,
         });
         setMatches(matchRes.data);

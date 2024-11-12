@@ -1,8 +1,7 @@
 "use client";
 
-import FormModal from "@/components/FormModel";
 import Table from "@/components/Table";
-import axiosInstance from "@/lib/axios";
+import useAxioAuth from "@/hooks/useAxioAuth";
 import { formatReadableDate } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
@@ -19,6 +18,7 @@ const SingleTournamentPage = ({
   const [players, setPlayers] = useState<PlayerLeaderBoard[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const axiosAuth = useAxioAuth();
 
   // Fetch data using Axios
   useEffect(() => {
@@ -27,7 +27,7 @@ const SingleTournamentPage = ({
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
         const id = await params.id;
-        const response = await axiosInstance.get("/api/match/" + id); // change to /api/user
+        const response = await axiosAuth.get("/api/match/" + id); // change to /api/user
         setMatch(response.data);
         console.log(response.data);
         setPlayers([response.data.player1, response.data.player2]);

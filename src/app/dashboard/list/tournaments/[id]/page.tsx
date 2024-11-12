@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import axiosInstance from "@/lib/axios";
+import useAxioAuth from "@/hooks/useAxioAuth";
 import { formatReadableDate, toTitleCase } from "@/lib/utils";
 import clsx from "clsx";
 import { useSession } from "next-auth/react";
@@ -43,6 +43,7 @@ const SingleTournamentPage = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [shouldRefresh, setShouldRefresh] = useState(false);
+  const axiosAuth = useAxioAuth();
 
   // Fetch data using Axios
   useEffect(() => {
@@ -51,18 +52,15 @@ const SingleTournamentPage = ({
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
         const id = await params.id;
-        const tournamentRes = await axiosInstance.get("/api/tournament/" + id);
+        const tournamentRes = await axiosAuth.get("/api/tournament/" + id);
         setTournaments(tournamentRes.data);
         setMatches(tournamentRes.data.matches);
         setPlayers(tournamentRes.data.players);
         setTournamentId(tournamentRes.data.id);
 
-        const winnerRes = await axiosInstance.get(
-          "/api/tournament/winner/" + id,
-          {
-            withCredentials: true,
-          }
-        );
+        const winnerRes = await axiosAuth.get("/api/tournament/winner/" + id, {
+          withCredentials: true,
+        });
         setWinner(winnerRes.data);
       } catch (err) {
         console.error("Error fetching tournaments:", err);
@@ -82,7 +80,7 @@ const SingleTournamentPage = ({
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
       const id = await params.id;
-      await axiosInstance.put("/api/tournament/start/" + id, "", {
+      await axiosAuth.put("/api/tournament/start/" + id, "", {
         withCredentials: true,
       });
       router.refresh();

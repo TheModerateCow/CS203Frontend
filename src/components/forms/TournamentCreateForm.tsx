@@ -2,25 +2,23 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import axiosInstance from "@/lib/axios";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Input } from "../ui/input";
 import { ToastAction } from "../ui/toast";
-import { Calendar as CalendarIcon } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
 
 import {
   Popover,
@@ -47,6 +45,7 @@ import {
 } from "@/components/ui/dialog";
 
 // import * as dialog from "@/components/ui/dialog";
+import useAxioAuth from "@/hooks/useAxioAuth";
 import Image from "next/image";
 
 const formSchema = z.object({
@@ -77,6 +76,7 @@ interface MyComponentProps {
 
 const TournamentCreateForm: React.FC<MyComponentProps> = ({ onRefresh }) => {
   const router = useRouter();
+  const axioAuth = useAxioAuth();
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -97,7 +97,7 @@ const TournamentCreateForm: React.FC<MyComponentProps> = ({ onRefresh }) => {
     setLoading(true);
 
     try {
-      await axiosInstance.post(
+      await axioAuth.post(
         "/api/tournament",
         {
           name: values.name,

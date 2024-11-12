@@ -5,7 +5,7 @@ import Pagination from "@/components/Pagination";
 import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
 import { Badge } from "@/components/ui/badge";
-import axiosInstance from "@/lib/axios";
+import useAxioAuth from "@/hooks/useAxioAuth";
 import { toTitleCase } from "@/lib/utils";
 import clsx from "clsx";
 import { useSession } from "next-auth/react";
@@ -52,12 +52,13 @@ const TournamentPage = () => {
   const [shouldRefresh, setShouldRefresh] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const axiosAuth = useAxioAuth();
 
   // Fetch data using Axios
   useEffect(() => {
     const fetchTournaments = async () => {
       try {
-        const response = await axiosInstance.get("/api/tournament");
+        const response = await axiosAuth.get("/api/tournament");
         setTournaments(response.data);
         setLoading(false);
       } catch (err) {

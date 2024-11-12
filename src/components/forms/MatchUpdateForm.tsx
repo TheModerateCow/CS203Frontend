@@ -10,7 +10,6 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import axiosInstance from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -19,6 +18,7 @@ import { z } from "zod";
 import { Input } from "../ui/input";
 import { ToastAction } from "../ui/toast";
 
+import useAxioAuth from "@/hooks/useAxioAuth";
 import { ScrollArea } from "../ui/scroll-area";
 
 const formSchema = z.object({
@@ -66,9 +66,7 @@ const MatchUpdateForm: React.FC<MyComponentProps> = ({
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [id, setMatchId] = useState(0);
-
-  // setMatchId(matchId);
-  // console.log(id);
+  const axiosAuth = useAxioAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -96,7 +94,7 @@ const MatchUpdateForm: React.FC<MyComponentProps> = ({
         b = true;
       }
 
-      const res = await axiosInstance.put(
+      const res = await axiosAuth.put(
         "/api/tournament/match",
         {
           id: matchId,

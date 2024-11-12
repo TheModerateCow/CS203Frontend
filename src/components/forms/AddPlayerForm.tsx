@@ -1,13 +1,13 @@
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
+import useAxioAuth from "@/hooks/useAxioAuth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -15,7 +15,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
-import axiosInstance from "@/lib/axios";
 import { ScrollArea } from "../ui/scroll-area";
 import { SheetClose } from "../ui/sheet";
 
@@ -40,11 +39,12 @@ const AddPlayerForm: React.FC<MyComponentProps> = ({
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [players, setPlayers] = useState<any[]>([]); // Ensure players starts as an array
+  const axioAuth = useAxioAuth();
 
   useEffect(() => {
     const fetchPlayers = async () => {
       try {
-        const response = await axiosInstance.get("/api/player");
+        const response = await axioAuth.get("/api/player");
         // Ensure players is always an array
         setPlayers(Array.isArray(response.data) ? response.data : []);
       } catch (err) {
@@ -74,7 +74,7 @@ const AddPlayerForm: React.FC<MyComponentProps> = ({
     // });
 
     try {
-      const response = await axiosInstance.put(
+      const response = await axioAuth.put(
         `/api/tournament/${tournamentId}/players`,
         JSON.stringify(data, null, 2),
         { withCredentials: true }
