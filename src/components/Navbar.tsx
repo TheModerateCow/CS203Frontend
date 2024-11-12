@@ -1,9 +1,8 @@
-import React from "react";
-import { CiBullhorn, CiChat1, CiSearch } from "react-icons/ci";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import Link from "next/link";
-import { useSession } from "next-auth/react";
 import { getLastWord, toTitleCase } from "@/lib/utils";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { CiSearch } from "react-icons/ci";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 const Navbar = () => {
   const { data: session, status } = useSession();

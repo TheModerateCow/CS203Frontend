@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import useAxioAuth from "@/hooks/useAxioAuth";
+import axiosInstance from "@/lib/axios";
 
 const formSchema = z
   .object({
@@ -63,7 +64,7 @@ export default function RegisterAdminPage() {
     setLoading(true);
 
     try {
-      const result = await axioAuth.post("/api/auth/register", {
+      const result = await axiosInstance.post("/api/auth/register", {
         username: values.username,
         password: values.password,
         email: values.email,

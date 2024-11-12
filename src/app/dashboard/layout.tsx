@@ -4,7 +4,6 @@ import Menu from "@/components/Menu";
 import Navbar from "@/components/Navbar";
 import ProtectedRoute from "@/components/ProtectedRoutes";
 import Image from "next/image";
-import Link from "next/link";
 
 export default function DashboardLayout({
   children,
@@ -16,13 +15,10 @@ export default function DashboardLayout({
       <div className="h-screen flex">
         {/* LEFT */}
         <div className="w-[14%] md:w-[8%] lg:w-[16%] xl:w-[14%] p-4">
-          <Link
-            href="/"
-            className="flex items-center justify-center gap-2 lg:justify-start p-2"
-          >
+          <div className="flex items-center justify-center gap-2 lg:justify-start p-2">
             <Image src="/logo.svg" alt="logo" width={32} height={32} />
             <span className="hidden lg:block">TournaX</span>
-          </Link>
+          </div>
           <Menu />
         </div>
 

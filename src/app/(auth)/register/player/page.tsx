@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/hooks/use-toast";
 import useAxioAuth from "@/hooks/useAxioAuth";
+import axiosInstance from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -64,7 +65,7 @@ export default function RegisterPlayerPage() {
     setLoading(true);
 
     try {
-      const result = await axioAuth.post("/api/auth/register", {
+      const result = await axiosInstance.post("/api/auth/register", {
         username: values.username,
         password: values.password,
         email: values.email,
