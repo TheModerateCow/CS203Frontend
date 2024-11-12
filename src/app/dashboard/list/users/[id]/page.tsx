@@ -128,22 +128,32 @@ const SingleUserPage = ({ params }: { params: Promise<{ slug: string }> }) => {
             />
           </div>
           <div className="w-9/12 flex flex-col justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <h1 className="text-xl font-semibold">{user?.username}</h1>
+            <div className="flex items-center gap-4 py-5">
+              <h1 className="text-2xl font-semibold underline">
+                {user?.username}
+              </h1>
             </div>
-            <p className="text-sm text-gray-500">
-              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Illum
-              modi voluptatem earum. Rem, nesciunt odit debitis veritatis quis,
-              accusamus voluptatum quaerat, cumque quam tempora itaque magnam in
-              adipisci ipsa quo!
-            </p>
-            <div className="flex items-center justify-between gap-2 flex-wrap text-xs font-medium">
-              <div className="w-full md:w-1/3 lg:w-full 2xl:w-1/3 flex items-center gap-2">
-                <Image src="/mail.png" alt="" width={14} height={14} />
+            <p className="text-xl text-black">Hello!</p>
+            <div className="flex flex-col items-start gap-2 text-xs font-medium">
+              {/* Email */}
+              <div className="w-full flex items-center gap-2 text-xl">
+                <Image
+                  src="/mail.png"
+                  alt="Email Icon"
+                  width={22}
+                  height={22}
+                />
                 <span>{user?.email}</span>
               </div>
-              <div className="w-full md:w-1/3 lg:w-full 2xl:w-1/3 flex items-center gap-2">
-                <Image src="/profile.png" alt="" width={14} height={14} />
+
+              {/* User Type */}
+              <div className="w-full flex items-center gap-2 text-xl">
+                <Image
+                  src="/profile.png"
+                  alt="Profile Icon"
+                  width={22}
+                  height={22}
+                />
                 <span>
                   {user?.userType === "ROLE_ADMIN" ? "Admin" : "Player"}
                 </span>

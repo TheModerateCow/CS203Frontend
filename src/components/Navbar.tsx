@@ -36,16 +36,16 @@ const Navbar = () => {
           className="flex items-center justify-between gap-2"
         >
           <div className="flex flex-col justify-center">
-            <span className="text-xs leading-3 font-medium">
+            <span className="text-sm leading-3 font-medium">
               {toTitleCase((session?.user as any)?.user.username)}
             </span>
             {/* Edit this for more dynamic roles */}
-            <span className="text-[10px] text-gray-500 text-right">
+            <span className="text-[12px] text-gray-500 text-right">
               {getLastWord(toTitleCase((session?.user as any)?.user.userType))}
             </span>
           </div>
           <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
+            <AvatarImage src="https://images.pexels.com/photos/9302141/pexels-photo-9302141.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
         </Link>
