@@ -71,13 +71,13 @@ const MatchUpdateForm: React.FC<MyComponentProps> = ({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      durationInMinutes: "0",
-      player1Score: "0",
-      player2Score: "0",
-      punchesPlayer1: "0",
-      punchesPlayer2: "0",
-      dodgesPlayer1: "0",
-      dodgesPlayer2: "0",
+      durationInMinutes: "60",
+      player1Score: "23",
+      player2Score: "18",
+      punchesPlayer1: "67",
+      punchesPlayer2: "34",
+      dodgesPlayer1: "56",
+      dodgesPlayer2: "23",
     },
   });
 
